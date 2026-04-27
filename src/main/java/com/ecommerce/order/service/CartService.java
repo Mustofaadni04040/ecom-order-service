@@ -1,6 +1,8 @@
 package com.ecommerce.order.service;
 
+import com.ecommerce.order.clients.ProductServiceClient;
 import com.ecommerce.order.dto.CartItemRequest;
+import com.ecommerce.order.dto.ProductResponse;
 import com.ecommerce.order.model.AddToCartResult;
 import com.ecommerce.order.model.CartItem;
 import com.ecommerce.order.repository.CartItemRepository;
@@ -16,19 +18,19 @@ import java.util.List;
 @Transactional
 public class CartService {
     private final CartItemRepository cartItemRepository;
+    private final ProductServiceClient productServiceClient;
 
     public AddToCartResult addToCart(String userId, CartItemRequest request) {
-//        Optional<Product> productOpt = productRepository.findById(request.getProductId());
-//
-//        if (productOpt.isEmpty()) {
-//            return AddToCartResult.PRODUCT_NOT_FOUND;
-//        }
-//
-//        Product product = productOpt.get();
-//        if (product.getStockQuantity() < request.getQuantity()) {
-//            return AddToCartResult.OUT_OF_STOCK;
-//        }
-//
+        ProductResponse productResponse = productServiceClient.getProductDetails(request.getProductId());
+
+        if (productResponse == null) {
+            return AddToCartResult.PRODUCT_NOT_FOUND;
+        }
+
+        if (productResponse.getStockQuantity() < request.getQuantity()) {
+            return AddToCartResult.OUT_OF_STOCK;
+        }
+
 //        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
 //        if (userOpt.isEmpty()) {
 //            return AddToCartResult.USER_NOT_FOUND;
