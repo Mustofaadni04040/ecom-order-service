@@ -1,8 +1,10 @@
 package com.ecommerce.order.service;
 
 import com.ecommerce.order.clients.ProductServiceClient;
+import com.ecommerce.order.clients.UserServiceClient;
 import com.ecommerce.order.dto.CartItemRequest;
 import com.ecommerce.order.dto.ProductResponse;
+import com.ecommerce.order.dto.UserResponse;
 import com.ecommerce.order.model.AddToCartResult;
 import com.ecommerce.order.model.CartItem;
 import com.ecommerce.order.repository.CartItemRepository;
@@ -19,9 +21,11 @@ import java.util.List;
 public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductServiceClient productServiceClient;
+    private final UserServiceClient userServiceClient;
 
     public AddToCartResult addToCart(String userId, CartItemRequest request) {
         ProductResponse productResponse = productServiceClient.getProductDetails(request.getProductId());
+        var userResponse = userServiceClient.getUserDetails(userId);
 
         if (productResponse == null) {
             return AddToCartResult.PRODUCT_NOT_FOUND;
@@ -31,12 +35,9 @@ public class CartService {
             return AddToCartResult.OUT_OF_STOCK;
         }
 
-//        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
-//        if (userOpt.isEmpty()) {
-//            return AddToCartResult.USER_NOT_FOUND;
-//        }
-//
-//        User user = userOpt.get();
+        if (userResponse.isEmpty()) {
+            return AddToCartResult.USER_NOT_FOUND;
+        }
 
         CartItem existingCartItem = cartItemRepository.findByUserIdAndProductId(userId, request.getProductId());
 
