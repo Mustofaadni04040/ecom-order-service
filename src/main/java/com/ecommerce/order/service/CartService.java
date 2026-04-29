@@ -9,6 +9,7 @@ import com.ecommerce.order.model.AddToCartResult;
 import com.ecommerce.order.model.CartItem;
 import com.ecommerce.order.repository.CartItemRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,12 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductServiceClient productServiceClient;
     private final UserServiceClient userServiceClient;
+    int attempt = 0;
 
-    @CircuitBreaker(name = "productService", fallbackMethod = "addToCartFallback")
+//    @CircuitBreaker(name = "productService", fallbackMethod = "addToCartFallback")
+    @Retry(name = "retryBreaker", fallbackMethod = "addToCartFallback")
     public AddToCartResult addToCart(String userId, CartItemRequest request) {
+        System.out.println("ATTEMPT: " + attempt);
         ProductResponse productResponse = productServiceClient.getProductDetails(request.getProductId());
         var userResponse = userServiceClient.getUserDetails(userId);
 
@@ -59,9 +63,13 @@ public class CartService {
         return AddToCartResult.SUCCESS;
     }
 
-    public boolean addToCartFallback(String userId, CartItemRequest request, Exception exception) {
-        exception.printStackTrace();
-        return false;
+    public AddToCartResult addToCartFallback(
+            String userId,
+            CartItemRequest request,
+            Throwable throwable
+    ) {
+        throwable.printStackTrace();
+        return AddToCartResult.PRODUCT_NOT_FOUND; // atau fallback lain
     }
 
     public AddToCartResult deleteItemFromCart(String userId, String productId) {

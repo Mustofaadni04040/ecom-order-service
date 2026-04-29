@@ -44,7 +44,7 @@ public class CartController {
     }
 
     @DeleteMapping("/items/{productId}")
-    public ResponseEntity<String> removeFromCart(@RequestHeader("X-User-id") String userId, @PathVariable String productId) {
+    public ResponseEntity<String> removeFromCart(@RequestHeader("X-User-ID") String userId, @PathVariable String productId) {
         AddToCartResult removed = cartService.deleteItemFromCart(userId, productId);
 
         return switch (removed) {
@@ -67,7 +67,7 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartItem>> getCart(@RequestHeader("X-User-id") String userId) {
+    public ResponseEntity<List<CartItem>> getCart(@RequestHeader("X-User-ID") String userId) {
         return new ResponseEntity<>(cartService.getCart(userId), HttpStatus.OK);
     }
 }
