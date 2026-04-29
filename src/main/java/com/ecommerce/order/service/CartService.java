@@ -69,7 +69,7 @@ public class CartService {
             Throwable throwable
     ) {
         throwable.printStackTrace();
-        return AddToCartResult.PRODUCT_NOT_FOUND; // atau fallback lain
+        return AddToCartResult.PRODUCT_NOT_FOUND;
     }
 
     public AddToCartResult deleteItemFromCart(String userId, String productId) {

@@ -28,13 +28,6 @@ public class OrderService {
             return Optional.empty();
         }
 
-//        Optional<User> userOptional = userRepository.findById(Long.valueOf(userId));
-//        if (userOptional.isEmpty()) {
-//            return Optional.empty();
-//        }
-//
-//        User user = userOptional.get();
-
         BigDecimal totalPrice = cartItems.stream()
                 .map(CartItem::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
