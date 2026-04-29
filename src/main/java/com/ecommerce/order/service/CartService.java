@@ -24,7 +24,7 @@ public class CartService {
     private final ProductServiceClient productServiceClient;
     private final UserServiceClient userServiceClient;
 
-    @CircuitBreaker(name = "productService")
+    @CircuitBreaker(name = "productService", fallbackMethod = "addToCartFallback")
     public AddToCartResult addToCart(String userId, CartItemRequest request) {
         ProductResponse productResponse = productServiceClient.getProductDetails(request.getProductId());
         var userResponse = userServiceClient.getUserDetails(userId);
@@ -57,6 +57,11 @@ public class CartService {
         }
 
         return AddToCartResult.SUCCESS;
+    }
+
+    public boolean addToCartFallback(String userId, CartItemRequest request, Exception exception) {
+        exception.printStackTrace();
+        return false;
     }
 
     public AddToCartResult deleteItemFromCart(String userId, String productId) {
